@@ -40,4 +40,4 @@ History
 -------
 
 
-gplab was a project I originally started back in school a long, long ago. After many years, I decided to return to work on it. The original code (in Common Lisp) is long gone, so I rewrote it from scratch as a first foray into a large Python project. This Python implementation then languished for a couple of years, during which time I began using Python much more. Much of the old, poorly-designed code has been refactored, but some bits of ugliness persist. 
+gplab was a project I originally started back in school a long, long time ago. After many years, I decided to return to work on it. The original code (in Common Lisp) is long gone, so I rewrote it from scratch as a first foray into a large Python project. This Python implementation then languished for a couple of years, during which time I began using Python much more. Much of the old, poorly-designed code has been refactored, but some bits of ugliness persist. 

@@ -48,7 +48,10 @@ from xml.dom import minidom
 # Not necessarily the actual number of bits in a Python integer.
 integerBits = 32
 
-maxint = pow(2, integerBits-1)-1
+# A program is really a set of indices into the instruction set. Negative
+# indices are treated as integer literals, which are multiplied by -1 and
+# offset by half the maximum integer value.
+maxint = pow(2, integerBits-2)-1
 minint = -(maxint+1)
 
 # literalOffset: Integer literals are stored in programs as negative numbers.
