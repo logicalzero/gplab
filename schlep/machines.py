@@ -15,17 +15,17 @@ class Machine:
         """ Create a new Machine running the provided Program. Multiple 
             machines can refer to the same program.
             
-            @note: Machines should typically be created via the environment
+            Note: Machines should typically be created via the environment
                 with the method `Environment.createMachine()`
 
-            @param environment: The container holding this Machine (and
+            :param environment: The container holding this Machine (and
                 possibly others).
-            @type environment: `Environment`
-            @param program: The program that this machine will run.
-            @type program: `Program`
-            @keyword runForever: If `True` (default), the program starts over 
+            :type environment: `Environment`
+            :param program: The program that this machine will run.
+            :type program: `Program`
+            :param runForever: If `True` (default), the program starts over 
                 when it reaches the end.
-            @keyword clearData: If `True`, the stack is emptied when the 
+            :param clearData: If `True`, the stack is emptied when the 
                 program restarts. `False` is the default.
         """
         self.program = program
@@ -34,10 +34,18 @@ class Machine:
         self.clearData = clearData
         self.dataStack = Stack()
         self.pointerStack = Stack()
+        self.trackCoverage = trackCoverage
         if trackCoverage:
             self._codeCoverage = [False] * len(self.program)
         else:
-            self._codeCoverage = False
+            self._codeCoverage = []
+
+        self.currentPointer = 0
+        self.running = True
+        self.stackEmpty = False
+        self.missingTerminator = False
+        self.fitness = 0
+
         self.reset()
 
 
@@ -97,18 +105,18 @@ class Machine:
                 self.currentPointer = 0
                 
                 
-    def vstep (self):
+    def vstep(self):
         """ "Visual" step: Execute one instruction, providing debugging 
             information (printed to the console).
         """
         # TODO: This will eventually be removed.
         self.step()
-        print "Data Stack:", self.dataStack
-        print "Next instruction:", self.program[self.currentPointer].opname
-        print "Ptr. Stack:", self.pointerStack, "current:", self.currentPointer
+        print("Data Stack:", self.dataStack)
+        print("Next instruction:", self.program[self.currentPointer].opname)
+        print("Ptr. Stack:", self.pointerStack, "current:", self.currentPointer)
 
 
-###############################################################################        
+#############################################################################
 
 class TuringMachine(Machine):
     """
@@ -135,14 +143,14 @@ class TuringMachine(Machine):
         """ Explicitly changes the active stack. Since there are only two, any 
             even number enables stack 0; any odd number enables stack 1.
             
-            @param stackNum: The stack number (0-1) to make 'active'.
+            :param stackNum: The stack number (0-1) to make 'active'.
                 Only the last bit is used, so any range of numbers is valid.
         """
         self.activeStackNum = stackNum & 1
         self.dataStack = self.stacks[self.activeStackNum]
     
     
-###############################################################################        
+#############################################################################
         
 class RegisterMachine(Machine):
     """
@@ -158,5 +166,4 @@ class RegisterMachine(Machine):
         self.registers = [0] * numRegisters
 
 
-###############################################################################        
-
+#############################################################################

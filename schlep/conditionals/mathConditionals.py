@@ -4,32 +4,33 @@ from schlep.instructionset import InstructionSet, conditional
 
 instructionSet = InstructionSet(name=__name__)
 
+
 @conditional(instructionSet)
 def ifEqual(machine):
     """Destructively compares the top two elements of the stack for equality."""
-    a,b = machine.dataStack.pop2()
-    return (a == b)
+    a, b = machine.dataStack.pop2()
+    return a == b
 
 
 @conditional(instructionSet)
 def ifUnequal(machine):
     """Destructively compares the top two elements of the stack for inequality."""
-    a,b = machine.dataStack.pop2()
-    return (a != b)    
+    a, b = machine.dataStack.pop2()
+    return a != b
 
 
 @conditional(instructionSet)
 def ifGreaterThan(machine):
     """Destructively compares the top two elements of the stack: stack[top] > stack[top-1]."""
-    a,b = machine.dataStack.pop2()
-    return (a > b)
+    a, b = machine.dataStack.pop2()
+    return a > b
 
 
 @conditional(instructionSet)
 def ifLessThan(machine):
     """Destructively compares the top two elements of the stack: stack[top] < stack[top-1]."""
-    a,b = machine.dataStack.pop2()
-    return (a < b)
+    a, b = machine.dataStack.pop2()
+    return a < b
 
 
 @conditional(instructionSet)
@@ -49,14 +50,14 @@ def ifEven(machine):
 
 @conditional(instructionSet)
 def ifOdd(machine):
-    return not (ifEven(machine))
+    return not ifEven(machine)
 
 
 @conditional(instructionSet)
 def whileEqual(machine):
     """Destructively compares the top two elements of the stack: stack[top] == stack[top-1].
     The machine's current function pointer gets pushed on the function pointer stack."""
-    if (ifEqual(machine)):
+    if ifEqual(machine):
         machine.pushFP()
         return True
     else:
@@ -67,7 +68,7 @@ def whileEqual(machine):
 def whileUnequal(machine):
     """Destructively compares the top two elements of the stack: stack[top] != stack[top-1].
     The machine's current function pointer gets pushed on the function pointer stack."""
-    if (ifUnequal(machine)):
+    if ifUnequal(machine):
         machine.pushFP()
         return True
     else:
@@ -78,7 +79,7 @@ def whileUnequal(machine):
 def whileGreaterThan(machine):
     """Destructively compares the top two elements of the stack: stack[top] >stack[top-1].
     The machine's current function pointer gets pushed on the function pointer stack."""
-    if (ifGreaterThan(machine)):
+    if ifGreaterThan(machine):
         machine.pushFP()
         return True
     else:
@@ -89,16 +90,16 @@ def whileGreaterThan(machine):
 def whileLessThan(machine):
     """Destructively compares the top two elements of the stack: stack[top] < stack[top-1].
     The machine's current function pointer gets pushed on the function pointer stack."""
-    if (ifLessThan(machine)):
+    if ifLessThan(machine):
         machine.pushFP()
         return True
     else:
         return False
 
-###############################################################################        
+
+#############################################################################
 
 def getInstructions(instructions):
     """Adds the instructions defined in this module to a master dictionary used by the SCHLEP machine."""
     for i in instructionSet:
         instructions[i] = instructionSet[i]
-        

@@ -19,13 +19,13 @@ def input_(machine):
 def output(machine):
     """Print the topmost element of the stack."""
     item = machine.dataStack.peek()
-    print "Top item in data stack:", item
+    print ("Top item in data stack:", item)
     return True
 
 
 @operator(instructionSet)
 def outputStack(machine):
     """Print the entire stack to the console."""
-    print "Stack contents:", machine.dataStack.data
+    print ("Stack contents:", machine.dataStack.data)
     return True
     
