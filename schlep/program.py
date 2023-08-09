@@ -37,9 +37,17 @@ class Program(object):
         # code is an array of indices into the instructionSet.
         # instructionSet is an array of function references (in conditionals
         # and operators modules)
+        self.instructionSet = instructionSet
+        self.id = id if id is not None else str(uuid1())
+        self.parents = parents
+
+        self.indices = []
+        self.code = []
+        self.jumpTable = {}
+        self.fitness = 0
+        self._hash = None
+
         if isinstance(src, str):
-            self.indices = []
-            self.code = []
             for t in src.split():
                 if all(c in "0123456789-." for c in t):
                     v = int(t) + instructionSet.literalOffset
@@ -50,16 +58,8 @@ class Program(object):
             self.indices = src
         else:
             raise TypeError("code must be either an array or a string")
-        self.length = len(self.indices)
-        self.instructionSet = instructionSet
-        self.jumpTable = {}
-        self.fitness = 0
-
-        self.id = id if id is not None else str(uuid1())
-        self.parents = parents
 
         self.compile()
-        self._hash = None
 
     def __str__(self) -> str:
         """ Generates human-readable source code from a Program."""
@@ -69,7 +69,7 @@ class Program(object):
         return "<%s id:%s>" % (self.__class__.__name__, self.id)
 
     def __len__(self) -> int:
-        return self.length
+        return len(self.indices)
 
     def __hash__(self) -> int:
         if self._hash is None:

@@ -1,11 +1,6 @@
 """
 """
 from collections import Sequence
-from importlib import import_module
-from numbers import Number
-from xml.dom import minidom
-
-# import xmlhelpers
 
 
 # ===========================================================================
@@ -14,7 +9,7 @@ from xml.dom import minidom
 
 def operator(instructionSet, name=None, cost=None):
     def decorator(target):
-        opname = name if name is not None else target.__name__
+        opname = name or target.__name__
         setattr(target, 'cost', cost)
         setattr(target, 'isConditional', False)
         setattr(target, 'isOperator', True)
@@ -29,7 +24,7 @@ def operator(instructionSet, name=None, cost=None):
 
 def conditional(instructionSet, name=None, cost=None):
     def decorator(target):
-        opname = name if name is not None else target.__name__
+        opname = name or target.__name__
         setattr(target, 'cost', cost)
         setattr(target, 'isConditional', True)
         setattr(target, 'isOperator', False)
@@ -44,7 +39,7 @@ def conditional(instructionSet, name=None, cost=None):
 
 def terminator(instructionSet, name=None, cost=None):
     def decorator(target):
-        opname = name if name is not None else target.__name__
+        opname = name or target.__name__
         setattr(target, 'cost', cost)
         setattr(target, 'isConditional', False)
         setattr(target, 'isOperator', False)
@@ -112,7 +107,7 @@ class InstructionSet:
 
     def __getitem__(self, k):
         """x.__getitem__(y) <==> x[y]"""
-        if isinstance(k, Number):
+        if isinstance(k, int):
             return self.getByIndex(k)
         return self._instructions[k]
 
@@ -128,11 +123,8 @@ class InstructionSet:
     def __repr__(self):
         """ """
         if self.name is not None:
-            return "<InstructionSet %s: %s>" % (self.name, list(self._instructions.keys()))
-        return "<InstructionSet: %s>" % list(self._instructions.keys())
-
-    def __eq__(self, other):
-        return str(self) == str(other)
+            return f"<InstructionSet {self.name} ({len(self._instructions)} instructions)>"
+        return f"<InstructionSet ({len(self._instructions)} instructions)>"
 
     def clear(self):
         """od.clear() -> None.  Remove all items from od."""
@@ -144,12 +136,12 @@ class InstructionSet:
         return InstructionSet(instructionSize=self.instructionSize,
                               **self._instructions)
 
-    def get(self, k, d=None):
+    def get(self, k, *d):
         """D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None."""
-        if isinstance(k, Number):
+        if isinstance(k, int):
             return self.getByIndex(k)
 
-        return self._instructions.get(k, d)
+        return self._instructions.get(k, *d)
 
     def pop(self, *args):
         """od.pop(k[,d]) -> v, remove specified key and return the corresponding
@@ -211,7 +203,7 @@ class InstructionSet:
             self._reindex()
         return self._terminators
 
-    def getByIndex(self, idx):
+    def getByIndex(self, idx: int):
         """ Returns the instruction corresponding to an index. If the index
             is larger than the number of instructions, it wraps around.
         """
@@ -237,7 +229,7 @@ class InstructionSet:
         """
         return [self[name] for name in args]
 
-    def index(self, k):
+    def index(self, k: str):
         """ Returns the index of an Instruction.
         """
         return list(self._instructions.keys()).index(k)
@@ -258,25 +250,7 @@ class InstructionSet:
             
             :rtype: `xml.dom.minidom.Element`
         """
-        parentEl = minidom.Element("InstructionSet")
-        xmlhelpers.copyAttributes(parentEl, self, "name")
-        xmlhelpers.copyAttributes(parentEl, self, ("defaultOperatorCost",
-                                                   "defaultConditionalCost",
-                                                   "defaultTerminatorCost"),
-                                  default=1.0)
-
-        for name, instruction in self._instructions.items():
-            atts = {"name": name,
-                    "module": instruction.__module__,
-                    "cost": getattr(instruction, "cost", None)}
-            if instruction.isConditional:
-                xmlhelpers.addChildNode(parentEl, "conditional", atts)
-            elif instruction.isTerminator:
-                xmlhelpers.addChildNode(parentEl, "terminator", atts)
-            else:
-                xmlhelpers.addChildNode(parentEl, "operator", atts)
-
-        return parentEl
+        raise NotImplementedError('this needs to be re-implemented')
 
     @classmethod
     def fromXml(cls, el):
@@ -293,18 +267,4 @@ class InstructionSet:
             :type el: `xml.dom.minidom.Element`
             :rtype: `InstructionSet`
         """
-        newSet = []
-        for c in el.childNodes:
-            nodeType = getattr(c, "nodeType", None)
-            if nodeType == el.ELEMENT_NODE:
-                opname = c.getAttribute("name")
-                module = c.getAttribute("module")
-                instruction = getattr(import_module(module), "instructionSet")[opname]
-                newSet.append((opname, instruction))
-        instructionSet = cls(newSet, name=el.getAttribute("name"))
-        for att in ("defaultOperatorCost", "defaultConditionalCost", "defaultTerminatorCost"):
-            if el.hasAttribute(att):
-                setattr(instructionSet, att, float(el.getAttribute(att)))
-            else:
-                setattr(instructionSet, att, 1.0)
-        return instructionSet
+        raise NotImplementedError('this needs to be re-implemented')
