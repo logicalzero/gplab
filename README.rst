@@ -1,6 +1,9 @@
 gplab README
 ============
 
+> [!WARNING]
+> This branch is a very early work in progress. Do not use.
+
 
 gplab is (or will be) a framework for experimenting with genetic programming. Central to the project is a simple stack-based programming language called SCHLEP. SCHLEP was designed specifically for use in genetic programming; any string of bits is a valid, functioning program. 
 

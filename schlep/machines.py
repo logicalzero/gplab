@@ -2,7 +2,14 @@
 Different types of basic SCHLEP virtual machines.
 """
 
-from schlep.stack import Stack
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .environment import Environment
+
+from .stack import Stack
+from .program import Program
+
+
 
 class Machine:
     """
@@ -10,8 +17,12 @@ class Machine:
     single, integer data stack.
     """
     
-    def __init__(self, environment, program, runForever=True, 
-                 clearData=False, trackCoverage=True):
+    def __init__(self,
+                 environment: "Environment",
+                 program: Program,
+                 runForever: bool = True,
+                 clearData: bool = False,
+                 trackCoverage: bool = True):
         """ Create a new Machine running the provided Program. Multiple 
             machines can refer to the same program.
             
@@ -104,17 +115,6 @@ class Machine:
                 self.missingTerminator = True
                 self.currentPointer = 0
                 
-                
-    def vstep(self):
-        """ "Visual" step: Execute one instruction, providing debugging 
-            information (printed to the console).
-        """
-        # TODO: This will eventually be removed.
-        self.step()
-        print("Data Stack:", self.dataStack)
-        print("Next instruction:", self.program[self.currentPointer].opname)
-        print("Ptr. Stack:", self.pointerStack, "current:", self.currentPointer)
-
 
 #############################################################################
 
@@ -125,9 +125,13 @@ class TuringMachine(Machine):
     and accessed via the standard 'dataStack' property.
     """
     
-    def __init__(self, environment, program, runForever=True, 
-                 clearData=False):
-        Machine.__init__(self, environment, program, runForever, clearData)
+    def __init__(self,
+                 environment: "Environment",
+                 program: Program,
+                 runForever: bool = True,
+                 clearData: bool = False,
+                 trackCoverage: bool = True):
+        Machine.__init__(self, environment, program, runForever, clearData, trackCoverage)
         self.activeStackNum = 0
         self.stacks = (Stack(), Stack())
         self.dataStack = self.stacks[0]
@@ -139,7 +143,7 @@ class TuringMachine(Machine):
         self.changeStack((self.activeStackNum & 1) ^ 1)
 
 
-    def changeStack(self, stackNum):
+    def changeStack(self, stackNum: int):
         """ Explicitly changes the active stack. Since there are only two, any 
             even number enables stack 0; any odd number enables stack 1.
             
@@ -160,9 +164,14 @@ class RegisterMachine(Machine):
     the stack. 
     """
     
-    def __init__(self, environment, program, runForever=True, clearData=False,
-                 numRegisters=8):
-        Machine.__init__(self, environment, program, runForever, clearData)
+    def __init__(self,
+                 environment: "Environment",
+                 program: Program,
+                 runForever: bool = True,
+                 clearData: bool = False,
+                 numRegisters: int = 8,
+                 trackCoverage: bool = True):
+        Machine.__init__(self, environment, program, runForever, clearData, trackCoverage)
         self.registers = [0] * numRegisters
 
 

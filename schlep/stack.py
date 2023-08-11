@@ -120,7 +120,7 @@ class IntStack(Stack):
         self.stackEmpty = False
         self.overflow = False
 
-    def push(self, val):
+    def push(self, val: int):
         """ Add a value to the top of the stack.
         """
         self.stackEmpty = False

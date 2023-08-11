@@ -1,14 +1,29 @@
 """
 """
 from collections import Sequence
+from typing import Callable, Optional
 
 
 # ===========================================================================
 # Decorators for simplifying the definition of instruction set items.
 # ===========================================================================
 
-def operator(instructionSet, name=None, cost=None):
-    def decorator(target):
+def operator(instructionSet: "InstructionSet",
+             name: Optional[str] = None,
+             cost: Optional[int] = None) -> Callable:
+    """ Decorator for setting up a function as a SCHLEP 'operator'.
+
+        :param instructionSet: The instruction set to which this
+            operator belongs. Operators can be explicitly added to
+            multiple instruction sets; this is a convenience.
+        :param name: An optional name, overriding the decorated function's
+            name. For use if the desired name in a SCHLEP program
+            conflicts with Python keywords or exisiting functions.
+        :param cost: A default cost for executing this operator.
+            Can be overridden in the instruction set.
+    """
+
+    def decorator(target: Callable):
         opname = name or target.__name__
         setattr(target, 'cost', cost)
         setattr(target, 'isConditional', False)
@@ -22,7 +37,21 @@ def operator(instructionSet, name=None, cost=None):
     return decorator
 
 
-def conditional(instructionSet, name=None, cost=None):
+def conditional(instructionSet: "InstructionSet",
+                name: Optional[str] = None,
+                cost: Optional[int] = None) -> Callable:
+    """ Decorator for setting up a function as a SCHLEP 'conditional'.
+
+        :param instructionSet: The instruction set to which this
+            conditional belongs. Conditionals can be explicitly added to
+            multiple instruction sets; this is a convenience.
+        :param name: An optional name, overriding the decorated function's
+            name. For use if the desired name in a SCHLEP program
+            conflicts with Python keywords or exisiting functions.
+        :param cost: A default cost for executing this conditional.
+            Can be overridden in the instruction set.
+    """
+
     def decorator(target):
         opname = name or target.__name__
         setattr(target, 'cost', cost)
@@ -37,7 +66,21 @@ def conditional(instructionSet, name=None, cost=None):
     return decorator
 
 
-def terminator(instructionSet, name=None, cost=None):
+def terminator(instructionSet: "InstructionSet",
+               name: Optional[str] = None,
+               cost: Optional[int] = None) -> Callable:
+    """ Decorator for setting up a function as a SCHLEP 'terminator'.
+
+        :param instructionSet: The instruction set to which this
+            terminator belongs. Terminators can be explicitly added to
+            multiple instruction sets; this is a convenience.
+        :param name: An optional name, overriding the decorated function's
+            name. For use if the desired name in a SCHLEP program
+            conflicts with Python keywords or exisiting functions.
+        :param cost: A default cost for executing this terminator.
+            Can be overridden in the instruction set.
+    """
+
     def decorator(target):
         opname = name or target.__name__
         setattr(target, 'cost', cost)
@@ -229,12 +272,12 @@ class InstructionSet:
         """
         return [self[name] for name in args]
 
-    def index(self, k: str):
+    def index(self, k: str) -> int:
         """ Returns the index of an Instruction.
         """
         return list(self._instructions.keys()).index(k)
 
-    def __add__(self, other):
+    def __add__(self, other: "InstructionSet"):
         """
         """
         result = self.copy()

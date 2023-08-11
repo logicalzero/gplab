@@ -2,7 +2,6 @@ import struct
 from typing import Callable, Union
 from uuid import uuid1
 import warnings
-from xml.dom import minidom
 
 from schlep.instructionset import InstructionSet
 
@@ -60,13 +59,14 @@ class Program(object):
             raise TypeError("code must be either an array or a string")
 
         self.compile()
+        self.length = len(self.code)
 
     def __str__(self) -> str:
         """ Generates human-readable source code from a Program."""
         return ' '.join([x.opname for x in self.code])
 
     def __repr__(self) -> str:
-        return "<%s id:%s>" % (self.__class__.__name__, self.id)
+        return f"<{type(self).__name__} id:{self.id}>"
 
     def __len__(self) -> int:
         return len(self.indices)
@@ -114,7 +114,7 @@ class Program(object):
                 self.code.append(self.instructionSet.getByIndex(i))
 
         # Fill out the 'jump table' for faster processing of conditionals
-        self.jumpTable = {}
+        self.jumpTable.clear()
         for i in range(len(self.indices) - 1):
             if self.code[i].isConditional:
                 self.jumpTable[i] = self._getElse(i)
@@ -184,22 +184,14 @@ class Program(object):
         """ Export this program as XML. This is just the program itself, not
             its InstructionSet.
         """
-        el = minidom.Element("Program")
-        el.setAttribute("id", self.id)
-        if self.parents is not None:
-            el.setAttribute("parents", " ".join(self.parents))
-        el.createTextNode(str(self))
-        return el
+        raise NotImplementedError(f"TODO: reimplement {type(self).__name__}.toXml()")
+
 
     @classmethod
     def fromXml(cls, el, instructionSet: InstructionSet):
         """ Import a program from an XML element.
         """
-        if el.firstChild is not None and el.firstChild.nodeType == el.TEXT_NODE:
-            return Program(el.firstChild.wholeText.strip(),
-                           instructionSet=instructionSet)
-        # TODO: Raise some sort of exception
-        return None
+        raise NotImplementedError(f"TODO: reimplement {cls.__name__}.toXml()")
 
 
     @classmethod
@@ -223,7 +215,7 @@ class Program(object):
         indices = [chunk[0] for chunk in struct.iter_unpack(fmt, data)]
         return cls(indices, instructionSet=instructionSet, **kwargs)
 
-    def toBinary(self):
+    def toBinary(self) -> bytes:
         """ Generate a packed binary string version of this program.
         """
         size = self.instructionSet.instructionSize

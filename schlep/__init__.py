@@ -32,23 +32,25 @@ from schlep.operators import terminators
 from schlep.machines import Machine
 
 from schlep.program import Program
+from schep.environment import Environment
+
 
 #############################################################################
 #############################################################################
 
 # The working number of bits in an integer, as used by the mutation function.
 # Not necessarily the actual number of bits in a Python integer.
-integerBits = 32
+INTEGER_BITS = 32
 
 # A program is really a set of indices into the instruction set. Negative
 # indices are treated as integer literals, which are multiplied by -1 and
 # offset by half the maximum integer value.
-maxint = pow(2, integerBits - 2) - 1
-minint = -(maxint + 1)
+MAX_INT = pow(2, INTEGER_BITS - 2) - 1
+MIN_INT = -(MAX_INT + 1)
 
 # literalOffset: Integer literals are stored in programs as negative numbers.
 # This offset returns it to the proper range.
-literalOffset = -maxint
+literalOffset = -MAX_INT
 
 #############################################################################
 #############################################################################
@@ -65,52 +67,3 @@ defaultInstructionSet.extend(terminators.instructionSet)
 # defaultInstructionSet.add(advancedMathOps.instructionSet)
 # defaultInstructionSet.add(bitwiseOps.instructionSet)
 
-
-#############################################################################
-#############################################################################
-
-
-class Environment:
-    """
-    A container and execution environment for one or more Machines.
-    """
-
-    def __init__(self, machine=Machine):
-        """ :param machine: The class of machine to 
-        """
-        self.machineConstructor = machine
-        self.machines = []
-
-    def createMachine(self, program, runForever=True, clearData=False):
-        """ Add a new SCHLEP machine to the environment, executing the 
-            specified Program. This is the preferred way to create machines,
-            as opposed to instantiating one directly.
-
-            :param program: The new machine's program
-            :param runForever: If `True` (default), the program starts over 
-                when it reaches the end.
-            :param clearData: If `True`, the stack is emptied when the 
-                program restarts. `False` is the default.
-            :return: The new machine.
-            @rtype: `Machine`
-        """
-        newMachine = self.machineConstructor(self,
-                                             program,
-                                             runForever=runForever,
-                                             clearData=clearData)
-        self.machines.append(newMachine)
-        return newMachine
-
-    def step(self):
-        """ Execute one instruction on all virtual machines.
-        """
-        for m in self.machines:
-            m.step()
-
-    def vstep(self):
-        """ Execute one instruction on all virtual machines in 'visual' mode.
-            For testing/debugging purposes.
-        """
-        for i in range(len(self.machines)):
-            print(f"Program {i} ({self.machines[i].id}):")
-            self.machines[i].vstep()
